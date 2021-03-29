@@ -7,7 +7,7 @@ Also adds some really iffy lambda functions and array helpers like map and filte
 
 ## Example
 
-The below code makes a button grow 100 pixels wider every time it's clicked, and smoothly transitions to the new width over a half second transition.
+The below code makes a button grow 100 pixels wider every time it's clicked, and smoothly transitions to the new width over a half second transition like in the gif above.
 
 ```GDScript
 var counter := Rx.new(0)
