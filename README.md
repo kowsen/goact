@@ -17,7 +17,7 @@ func _ready():
 
     var button_size = counter.pipe([
         RxMap.new("counter => Vector2(counter * 100, 50)")
-    ])
+    ]).keep_alive(self)
 
     button_size.attach($Counter, "rect_size", RxTransition.new(0.5))
 
