@@ -20,7 +20,7 @@ var title = toggle.pipe([
 ])
 
 # You can also combine these values to react to a change in any of them.
-var button_text = RxCombine.new([title, counter]).pipe([
+var button_text = Rx.combine([title, counter], [
 	# This only lets the value emit once every frame. This is helpful
 	# if something were to update title and counter at the same time,
 	# but we didn't want to consider the state where one's been updated
@@ -33,10 +33,6 @@ var button_text = RxCombine.new([title, counter]).pipe([
 # This is to show that even though we update title and counter on every click,
 # we won't get two emissions per click thanks to RxDebounce.
 var num_emissions := Rx.new(0)
-var str_emissions = num_emissions.pipe([
-	RxMap.string(),
-	RxMap.new("count => 'Emission count: ' + count")
-])
 
 func _ready():
 	$IncrementCounter.connect("pressed", self, "_on_increment_counter")
@@ -47,6 +43,15 @@ func _ready():
 	# They also have an "attach" method. Whenever "update" is fired, the Rx value will
 	# update the "text" property of $IncrementCounter automatically.
 	button_text.attach($IncrementCounter, "text")
+
+	# We use keep_alive here because otherwise str_emissions would be disposed when this
+	# function completed. This keeps it alive until label is freed (which it is when
+	# num_emissions equals three). Typically you would pass "self" into this function.
+	var str_emissions = num_emissions.pipe([
+		RxMap.string(),
+		RxMap.new("count => 'Emission count: ' + count")
+	]).keep_alive($Label)
+	
 	str_emissions.attach($NumEmissions, "text")
 
 	# This is where the real magic is. When button_size updates, IncrementCounter will
@@ -60,6 +65,8 @@ func _ready():
 
 func _on_text_update(_text):
 	num_emissions.value += 1
+	if num_emissions.value == 3:
+		$Label.queue_free()
 
 func _on_increment_counter():
 	toggle.value = !toggle.value

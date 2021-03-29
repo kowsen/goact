@@ -29,11 +29,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/goact/scripts/rx/attach.gd"
 }, {
-"base": "Reference",
-"class": "RxCombine",
-"language": "GDScript",
-"path": "res://addons/goact/scripts/rx/combine.gd"
-}, {
 "base": "Node",
 "class": "RxDebounce",
 "language": "GDScript",
@@ -74,7 +69,6 @@ _global_script_class_icons={
 "Lambda": "",
 "Rx": "",
 "RxAttach": "",
-"RxCombine": "",
 "RxDebounce": "",
 "RxDebug": "",
 "RxDistinct": "",
@@ -94,6 +88,7 @@ config/icon="res://icon.png"
 
 TimingUtil="*res://addons/goact/scripts/util/timing_util.gd"
 TweenUtil="*res://addons/goact/scripts/util/tween_util.gd"
+RxLifecycle="*res://addons/goact/scripts/rx/lifecycle.gd"
 
 [editor_plugins]
 

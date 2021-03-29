@@ -15,11 +15,21 @@ __meta__ = {
 }
 
 [node name="NumEmissions" type="Label" parent="."]
-margin_left = 298.0
-margin_top = 339.0
-margin_right = 338.0
-margin_bottom = 353.0
+margin_left = 160.0
+margin_top = 146.0
+margin_right = 228.0
+margin_bottom = 160.0
 text = "Testdsasdf"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = 66.0
+margin_top = 34.0
+margin_right = 618.0
+margin_bottom = 48.0
+text = "I GET FREE'D WHEN THE COUNTER IS 3, TAKING THE EMISSIONS SUBSCRIBER WITH ME!"
 __meta__ = {
 "_edit_use_anchors_": false
 }
