@@ -1,5 +1,5 @@
 # goact
-A janky but good enough (for my purposes) reactive library for Godot. You can see a demo of it working in the Root scene, or in the gif below!
+A janky but good enough (for my purposes) reactive library for Godot. You can check out a simple example of it working below, or a more complete example in the BigDemo scene.
 
 Also adds some really iffy lambda functions and array helpers like map and filter that use them.
 
