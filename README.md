@@ -9,7 +9,7 @@ Also adds some really iffy lambda functions and array helpers like map and filte
 
 The below code makes a button grow 100 pixels wider every time it's clicked, and smoothly transitions to the new width over a half second transition.
 
-```
+```GDScript
 var counter := Rx.new(0)
 
 func _ready():
