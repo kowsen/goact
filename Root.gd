@@ -4,23 +4,23 @@ var toggle := Rx.new(false)
 var counter := Rx.new(0)
 
 var title = toggle.pipe([
-	RxMap.new(Lambda.new(funcref(self, "_get_title")))
+	RxMap.new(funcref(self, "_get_title"))
 ])
 
 var button_text = RxCombine.new([title, counter]).pipe([
 	RxDebounce.new(),
-	RxMap.new(Lambda.new("x => x[0] + ': ' + String(x[1])"))
+	RxMap.new("x => x[0] + ': ' + String(x[1])")
 ])
 
 var button_size = counter.pipe([
-	RxMap.new(Lambda.new("counter => counter * 10 + 120")),
-	RxMap.new(Lambda.new("width => Vector2(width, 50)"))
+	RxMap.new("counter => counter * 10 + 120"),
+	RxMap.new("width => Vector2(width, 50)")
 ])
 
 var num_emissions := Rx.new(0)
 var str_emissions = num_emissions.pipe([
 	RxMap.string(),
-	RxMap.new(Lambda.new("count => 'Emission count: ' + count"))
+	RxMap.new("count => 'Emission count: ' + count")
 ])
 
 # Called when the node enters the scene tree for the first time.

@@ -26,7 +26,6 @@ class RxConnection:
 					_transition.transition_type, _transition.ease_type)
 			_tween.start()
 		else:
-			print("SETTING DIRECTLY: ", _prop, " - ", value)
 			_node.set_indexed(_prop, value)
 
 
