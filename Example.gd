@@ -1,15 +1,5 @@
-# goact
-A janky but good enough (for my purposes) reactive library for Godot. You can see a demo of it working in the Root scene, or in the gif below!
+extends Node2D
 
-Also adds some really iffy lambda functions and array helpers like map and filter that use them.
-
-## Example
-
-This code modifies a button's size and color based on a base counter variable, and smoothly transitions to the new values with very little code needed.
-
-![demo](https://github.com/kowsen/goact/blob/main/demo.gif?raw=true)
-
-```GDScript
 var COLOR_MAP = [Color.red, Color.green, Color.blue]
 
 var counter := Rx.new(0)
@@ -30,4 +20,3 @@ func _ready():
 
 func _on_increment():
 	counter.value = (counter.value + 1) % 3
-```
