@@ -1,0 +1,104 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "ArrayUtil",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/util/array_util.gd"
+}, {
+"base": "Reference",
+"class": "Lambda",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/lambda/lambda.gd"
+}, {
+"base": "Reference",
+"class": "Rx",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/rx.gd"
+}, {
+"base": "Reference",
+"class": "RxAttach",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/attach.gd"
+}, {
+"base": "Reference",
+"class": "RxCombine",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/combine.gd"
+}, {
+"base": "Node",
+"class": "RxDebounce",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/operators/debounce.gd"
+}, {
+"base": "Object",
+"class": "RxDebug",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/debug.gd"
+}, {
+"base": "Reference",
+"class": "RxDistinct",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/operators/distinct.gd"
+}, {
+"base": "Reference",
+"class": "RxFilter",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/operators/filter.gd"
+}, {
+"base": "Reference",
+"class": "RxMap",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/operators/map.gd"
+}, {
+"base": "Reference",
+"class": "RxOperatorResult",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/operators/operator_result.gd"
+}, {
+"base": "Reference",
+"class": "RxTransition",
+"language": "GDScript",
+"path": "res://addons/goact/scripts/rx/transition.gd"
+} ]
+_global_script_class_icons={
+"ArrayUtil": "",
+"Lambda": "",
+"Rx": "",
+"RxAttach": "",
+"RxCombine": "",
+"RxDebounce": "",
+"RxDebug": "",
+"RxDistinct": "",
+"RxFilter": "",
+"RxMap": "",
+"RxOperatorResult": "",
+"RxTransition": ""
+}
+
+[application]
+
+config/name="GoAct"
+run/main_scene="res://Root.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+TimingUtil="*res://addons/goact/scripts/util/timing_util.gd"
+TweenUtil="*res://addons/goact/scripts/util/tween_util.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "goact" )
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
