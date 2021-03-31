@@ -17,9 +17,11 @@ class RxConnection:
 		if _tween:
 			_tween.queue_free()
 
-	func update(value):
-		if _transition:
+	func update(value, skip_transition):
+		if _tween:
 			_tween.stop_all()
+		
+		if _transition && !skip_transition:
 			_tween.interpolate_property(
 					_node, _prop,
 					_node.get(_prop), value, _transition.time,
@@ -35,16 +37,16 @@ var _last_value
 func _init(start_value = null):
 	_last_value = start_value
 
-func update(value):
+func update(value, skip_transition):
 	_last_value = value
 	for connection in _attached_values:
-		connection.update(value)
+		connection.update(value, skip_transition)
 
 func attach(node: Node, prop: String, transition: RxTransition = null):
 	var connection = RxConnection.new(node, prop, transition)
 	_attached_values.append(connection)
 	_combine_binds(node, "tree_exiting", self, "_disconnect_value", [connection])
-	connection.update(_last_value)
+	connection.update(_last_value, true)
 
 func _disconnect_value(connections: Array):
 	for connection in connections:

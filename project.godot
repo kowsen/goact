@@ -81,7 +81,7 @@ _global_script_class_icons={
 [application]
 
 config/name="GoAct"
-run/main_scene="res://BigDemo.tscn"
+run/main_scene="res://EaseTest.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -92,7 +92,7 @@ RxLifecycle="*res://addons/goact/scripts/rx/lifecycle.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "goact" )
+enabled=PoolStringArray( "ease_container", "goact" )
 
 [rendering]
 
