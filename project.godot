@@ -19,6 +19,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/goact/scripts/lambda/lambda.gd"
 }, {
+"base": "RichTextEffect",
+"class": "RichTextMonitor",
+"language": "GDScript",
+"path": "res://addons/type_text/monitor_effect.gd"
+}, {
 "base": "Reference",
 "class": "Rx",
 "language": "GDScript",
@@ -67,6 +72,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "ArrayUtil": "",
 "Lambda": "",
+"RichTextMonitor": "",
 "Rx": "",
 "RxAttach": "",
 "RxDebounce": "",
@@ -81,7 +87,7 @@ _global_script_class_icons={
 [application]
 
 config/name="GoAct"
-run/main_scene="res://EaseTest.tscn"
+run/main_scene="res://addons/type_text/Terminal.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -89,10 +95,11 @@ config/icon="res://icon.png"
 TimingUtil="*res://addons/goact/scripts/util/timing_util.gd"
 TweenUtil="*res://addons/goact/scripts/util/tween_util.gd"
 RxLifecycle="*res://addons/goact/scripts/rx/lifecycle.gd"
+CursorTimer="*res://addons/type_text/CursorTimer.tscn"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "ease_container", "goact" )
+enabled=PoolStringArray( "ease_container", "goact", "type_text" )
 
 [rendering]
 

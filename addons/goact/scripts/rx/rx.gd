@@ -41,7 +41,6 @@ func keep_alive(container: Object):
 	return self
 
 func _combined_value_set(partial_value, skip_transition, index):
-	print(skip_transition)
 	var new_value = _raw_value.duplicate()
 	new_value[index] = partial_value
 	set_value(new_value, skip_transition)

@@ -1,0 +1,75 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://addons/type_text/Terminal.tres" type="DynamicFont" id=1]
+[ext_resource path="res://addons/type_text/Terminal.gd" type="Script" id=2]
+[ext_resource path="res://addons/type_text/monitor_effect.gd" type="Script" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="Theme" id=6]
+VScrollBar/icons/decrement = null
+VScrollBar/icons/decrement_highlight = null
+VScrollBar/icons/increment = null
+VScrollBar/icons/increment_highlight = null
+VScrollBar/styles/grabber = SubResource( 1 )
+VScrollBar/styles/grabber_highlight = SubResource( 2 )
+VScrollBar/styles/grabber_pressed = SubResource( 3 )
+VScrollBar/styles/scroll = SubResource( 4 )
+VScrollBar/styles/scroll_focus = SubResource( 5 )
+
+[sub_resource type="RichTextEffect" id=7]
+script = ExtResource( 3 )
+
+[sub_resource type="RichTextEffect" id=8]
+script = ExtResource( 3 )
+
+[sub_resource type="RichTextEffect" id=9]
+script = ExtResource( 3 )
+
+[sub_resource type="RichTextEffect" id=10]
+script = ExtResource( 3 )
+
+[node name="Terminal" type="Control"]
+margin_left = 108.0
+margin_top = 102.0
+margin_right = 522.0
+margin_bottom = 489.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+text = "[color=red]Tesyto[/color] is the [color=green]Pesto for the Resto.[/color] Isn't that the besto?"
+
+[node name="Label" type="RichTextLabel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = SubResource( 6 )
+custom_fonts/normal_font = ExtResource( 1 )
+bbcode_enabled = true
+bbcode_text = "[monitor][color=red]Tesyto[/color] is the [color=green]Pesto for the Resto.[/color] Isn't that the besto?[/monitor]"
+visible_characters = 56
+text = "Tesyto is the Pesto for the Resto. Isn't that the besto?"
+fit_content_height = true
+scroll_active = false
+custom_effects = [ SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ) ]
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cursor" type="ColorRect" parent="Label"]
+margin_left = 225.0
+margin_top = 159.0
+margin_right = 248.0
+margin_bottom = 205.0
+color = Color( 1, 0, 0, 1 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05

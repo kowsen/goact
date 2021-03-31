@@ -14,6 +14,7 @@ __meta__ = {
 [node name="EaseContainer" parent="." instance=ExtResource( 1 )]
 margin_right = 139.0
 margin_bottom = 126.0
+transition = 0.0
 
 [node name="ColorRect" type="ColorRect" parent="EaseContainer"]
 margin_right = 139.0
