@@ -5,7 +5,7 @@ var _ref: FuncRef
 var _expression: Expression
 var _context: Object
 
-func _init(lambda, context = null):
+func _init(lambda = "", context = null):
 	if lambda is FuncRef:
 		_ref = lambda
 		type = "funcref"

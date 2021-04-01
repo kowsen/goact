@@ -4,7 +4,7 @@ var is_async = false
 
 var _mapper: Lambda
 
-func _init(mapper, context = null):
+func _init(mapper = "", context = null):
 	_mapper = Lambda.new(mapper, context)
 
 func run(value):

@@ -4,7 +4,7 @@ var is_async = false
 
 var _filter: Lambda
 
-func _init(filter, context = null):
+func _init(filter = "", context = null):
 	_filter = Lambda.new(filter, context)
 
 func run(value):

@@ -9,7 +9,7 @@ var _raw_value
 var _attach_manager: RxAttach
 var _operators: Array
 
-func _init(start_value, operators: Array = []):
+func _init(start_value = null, operators: Array = []):
 	_operators = operators
 	set_value(start_value)
 	_attach_manager = RxAttach.new(value)
@@ -37,7 +37,8 @@ func pipe(operators: Array = []):
 	return derived
 
 func keep_alive(container: Object):
-	RxLifecycle.manage(self, container)
+	if !Engine.editor_hint:
+		RxLifecycle.manage(self, container)
 	return self
 
 func _combined_value_set(partial_value, skip_transition, index):

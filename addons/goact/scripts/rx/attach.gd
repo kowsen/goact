@@ -6,7 +6,7 @@ class RxConnection:
 	var _transition: RxTransition
 	var _tween: Tween
 
-	func _init(node: Node, prop: String, transition: RxTransition = null):
+	func _init(node: Node = null, prop: String = "", transition: RxTransition = null):
 		_node = node
 		_prop = prop
 		_transition = transition
