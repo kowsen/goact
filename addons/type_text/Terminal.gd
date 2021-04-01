@@ -1,6 +1,12 @@
 tool
 extends Control
 
+enum TextAlign {
+	LEFT,
+	CENTER,
+	RIGHT
+}
+
 # Signals
 signal typing_start
 signal typing_end
@@ -8,6 +14,7 @@ signal typing_end
 # Exports
 export var text := "" setget _set_text
 export var font: Font = null
+export(TextAlign) var align := TextAlign.LEFT
 export var show_cursor := true
 export var persist_cursor := true
 export var auto_start := true
@@ -29,26 +36,21 @@ onready var _cursor := $Label/Cursor
 var _cursor_position := Rx.new(Vector2.ZERO)
 var _last_type_time := Rx.new(-1)
 
-# Backing variables
-var _rx_text = Rx.new("")
-
 # Temporary storage
-var _current_line = 1
-var _last_line_break = 0
-var _pause_ticks = 0
+var _current_line: int
+var _last_line_break: int
+var _pause_ticks: int
 
 func _ready():
 	_timer.connect("timeout", self, "_show_next_char")
 	
 	yield(get_tree(), "idle_frame")
 	var is_cursor_active = CursorTimer.is_cursor_active if !Engine.editor_hint else Rx.new(false).keep_alive(self)
-	Rx.combine([is_cursor_active, _last_type_time, _rx_text], [
+	Rx.combine([is_cursor_active, _last_type_time], [
 		RxMap.new(funcref(self, "_should_show_cursor"))
 	]).keep_alive(self).attach(_cursor, "visible")
 	
 	_set_speed(speed)
-	
-	_rx_text.connect("update", self, "_on_text_update")
 	_on_text_update()
 
 func start():
@@ -57,8 +59,16 @@ func start():
 
 func refresh():
 	_set_text(text)
-		
-func _on_text_update(_arg = null):
+
+func _on_text_update():
+	# Not ready yet.
+	if !_label:
+		return
+
+	_current_line = 1
+	_last_line_break = 0
+	_pause_ticks = 0
+	
 	_timer.stop()
 	_label.bbcode_text = text
 	if font:
@@ -104,7 +114,6 @@ func _update_cursor():
 func _should_show_cursor(args):
 	var blink_enabled = args[0]
 	var last_typed_time = args[1]
-	var text = args[2]
 	
 	if text.length() == 0:
 		return false
@@ -155,7 +164,7 @@ func _show_next_char():
 
 func _set_text(new_text):
 	text = new_text
-	_rx_text.value = new_text
+	_on_text_update()
 	
 func _set_speed(new_speed):
 	speed = new_speed

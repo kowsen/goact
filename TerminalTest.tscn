@@ -17,7 +17,7 @@ margin_left = 105.0
 margin_top = 68.0
 margin_right = 515.0
 margin_bottom = 345.0
-text = "This is a test."
+text = "This is a test. I don't know what's going on here."
 font = ExtResource( 3 )
 
 [node name="Button" type="Button" parent="."]
