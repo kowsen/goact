@@ -8,8 +8,8 @@ signal typing_end
 # Exports
 export var text := "" setget _set_text
 export var font: Font = null
-export var show_cursor := true setget _set_show_cursor
-export var persist_cursor := true setget _set_persist_cursor
+export var show_cursor := true
+export var persist_cursor := true
 export var auto_start := true
 export var speed := 0.05 setget _set_speed
 
@@ -31,9 +31,6 @@ var _last_type_time := Rx.new(-1)
 
 # Backing variables
 var _rx_text = Rx.new("")
-var _rx_show_cursor := Rx.new(true)
-var _rx_persist_cursor := Rx.new(true)
-var _rx_speed := Rx.new(0.05)
 
 # Temporary storage
 var _current_line = 1
@@ -45,12 +42,11 @@ func _ready():
 	
 	yield(get_tree(), "idle_frame")
 	var is_cursor_active = CursorTimer.is_cursor_active if !Engine.editor_hint else Rx.new(false).keep_alive(self)
-	Rx.combine([is_cursor_active, _last_type_time, _rx_show_cursor, _rx_persist_cursor, _rx_text], [
+	Rx.combine([is_cursor_active, _last_type_time, _rx_text], [
 		RxMap.new(funcref(self, "_should_show_cursor"))
 	]).keep_alive(self).attach(_cursor, "visible")
 	
-	_rx_speed.connect("update", self, "_on_speed_change")
-	_on_speed_change(speed)
+	_set_speed(speed)
 	
 	_rx_text.connect("update", self, "_on_text_update")
 	_on_text_update()
@@ -58,6 +54,9 @@ func _ready():
 func start():
 	_timer.start()
 	emit_signal("typing_start")
+
+func refresh():
+	_set_text(text)
 		
 func _on_text_update(_arg = null):
 	_timer.stop()
@@ -105,17 +104,15 @@ func _update_cursor():
 func _should_show_cursor(args):
 	var blink_enabled = args[0]
 	var last_typed_time = args[1]
-	var is_show_cursor = args[2]
-	var is_persist_cursor = args[3]
-	var text = args[4]
+	var text = args[2]
 	
 	if text.length() == 0:
 		return false
 	
-	if !is_show_cursor:
+	if !show_cursor:
 		return false
 		
-	if !is_persist_cursor && last_typed_time == -1:
+	if !persist_cursor && last_typed_time == -1:
 		return false
 	
 	if blink_enabled:
@@ -155,23 +152,12 @@ func _show_next_char():
 	_update_pause()
 	_update_cursor()
 	return true
-	
-func _on_speed_change(new_speed):
-	if !Engine.editor_hint:
-		_timer.wait_time = new_speed
 
 func _set_text(new_text):
 	text = new_text
 	_rx_text.value = new_text
 	
-func _set_show_cursor(new_show_cursor):
-	show_cursor = new_show_cursor
-	_rx_show_cursor.value = new_show_cursor
-	
-func _set_persist_cursor(new_persist_cursor):
-	persist_cursor = new_persist_cursor
-	_rx_persist_cursor.value = new_persist_cursor
-	
 func _set_speed(new_speed):
 	speed = new_speed
-	_rx_speed.value = new_speed
+	if !Engine.editor_hint && _timer:
+		_timer.wait_time = new_speed

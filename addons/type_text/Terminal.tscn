@@ -28,12 +28,7 @@ script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-text = ""
 font = SubResource( 3 )
-show_cursor = true
-persist_cursor = true
-auto_start = true
-speed = 0.05
 
 [node name="Label" type="RichTextLabel" parent="."]
 anchor_right = 1.0
