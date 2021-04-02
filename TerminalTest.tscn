@@ -17,12 +17,11 @@ margin_left = 105.0
 margin_top = 68.0
 margin_right = 515.0
 margin_bottom = 345.0
-text = "This is a test. I dont know what's going on here."
+text = "[color=red]This is
+a [color=blue]test.[/color][/color] I dont know what's going on here."
 font = ExtResource( 3 )
-show_cursor = true
-persist_cursor = true
-auto_start = true
-speed = 0.05
+auto_start = false
+speed = 0.1
 
 [node name="Button" type="Button" parent="."]
 margin_left = 668.0

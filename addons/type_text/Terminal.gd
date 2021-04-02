@@ -6,8 +6,9 @@ signal typing_start
 signal typing_end
 
 # Exports
-export var text := "" setget _set_text
+export(String, MULTILINE) var text := "" setget _set_text
 export var font: Font = null
+export var color := Color.white
 export var show_cursor := true
 export var persist_cursor := true
 export var auto_start := true
@@ -61,12 +62,13 @@ func _on_text_update():
 	if !_label:
 		return
 
-	_current_line = 1
+	_current_line = 0
 	_last_line_break = 0
 	_pause_ticks = 0
 	
 	_timer.stop()
 	_label.bbcode_text = text
+	_label.add_color_override("default_color", color)
 	if font:
 		_label.add_font_override("normal_font", font)
 	else:
@@ -89,23 +91,23 @@ func _enable_cursor():
 	_cursor.rect_size = Vector2(base_size / 2, base_size)
 	_cursor_position.attach(_cursor, "rect_position")
 	_cursor_position.value = Vector2(0, CURSOR_SHRINK)
-	_cursor.color = _color_parser.get_color(0)
+	_cursor.color = _color_parser.get_color(0, color)
 
 func _update_cursor():
 	if Engine.editor_hint:
 		return
 	
-	var line_str = _label.text.substr(_last_line_break, _label.visible_characters - _last_line_break)
+	var line_str = _get_current_line_str()
 	var line_size = font.get_string_size(line_str)
 
-	var cursor_line = _current_line - 1
+	var cursor_line = _current_line
 	var cursor_x = line_size.x + CURSOR_PAD
 	if (cursor_x + _cursor.rect_size.x) > rect_size.x:
 		cursor_x = 0
 		cursor_line += 1
 	var cursor_y = line_size.y * cursor_line + CURSOR_SHRINK
 	_cursor_position.value = Vector2(cursor_x, cursor_y)
-	_cursor.color = _color_parser.get_color(_label.visible_characters)
+	_cursor.color = _color_parser.get_color(_label.visible_characters, color)
 	
 func _should_show_cursor(args):
 	var blink_enabled = args[0]
@@ -145,18 +147,34 @@ func _show_next_char():
 		_timer.stop()
 		emit_signal("typing_end")
 		return false
-	
+		
 	_label.visible_characters += 1
-	yield(get_tree(), "idle_frame")
-	var visible_line = _label.get_visible_line_count()
-	if visible_line > _current_line:
-		_current_line = visible_line
+
+	if _should_wrap_line():
+		_current_line += 1
 		_last_line_break = _label.visible_characters - 1
+		print("BROKE AT ", _last_line_break)
 	
 	_last_type_time.value = OS.get_ticks_msec()
 	_update_pause()
 	_update_cursor()
 	return true
+	
+func _should_wrap_line():
+	var line_height = font.get_string_size("A").y
+	var visible_characters = _label.visible_characters
+	while _get_last_visible_character(visible_characters).strip_edges().length() > 0:
+		visible_characters += 1
+	var current_line = _get_current_line_str(visible_characters)
+	print(visible_characters, ": ", current_line)
+	var current_height = font.get_wordwrap_string_size(current_line, rect_size.x).y
+	return current_height > line_height
+	
+func _get_last_visible_character(visible_characters := _label.visible_characters):
+	return _label.text.substr(visible_characters - 1, 1)
+	
+func _get_current_line_str(visible_characters := _label.visible_characters):
+	return _label.text.substr(_last_line_break, visible_characters - _last_line_break)
 
 func _set_text(new_text):
 	text = new_text

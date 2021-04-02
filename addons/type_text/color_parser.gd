@@ -1,42 +1,39 @@
 class_name ColorParser
 
-class TagSkipInfo:
-	var min_index: int
-	var amount: int
-
 class ColorInfo:
 	var color: Color
-	var chars: Array
+	# Inclusive
+	var start: int
+	# Exclusive
+	var end: int
 
 var DEFAULT_COLOR := Color8(0xff, 0xff, 0xff, 0)
 var REGEX := RegEx.new()
 
 var _color_info := []
-var _skip_info := []
 
 func _init():
 	REGEX.compile("\\[([^\\]]*)\\]")
-	parse("Test [color=red]Test2[/color] Test3")
 
 func parse(text: String):
+	_color_info = []
 	var results = REGEX.search_all(text)
+	var stack = []
 	for result in results:
-		var skip = TagSkipInfo.new()
-		skip.min_index = _reverse_index(result.get_end(), results)
-		skip.amount = result.get_end() - result.get_start()
-		_skip_info.push_back(skip)
-	
-	
-	pass
-	# populate _skip_info
-	# populate _color_info
+		var parsed = _parse_tag(result.get_string(1))
+		if parsed:
+			parsed.start = _reverse_index(result.get_end(), results)
+			stack.push_back(parsed)
+		else:
+			var finished = stack.pop_back()
+			finished.end = _reverse_index(result.get_start(), results)
+			_color_info.push_back(finished)
 
-func get_color(index: int):
-	var translated_index = _translate_index(index)
+func get_color(index: int, default := DEFAULT_COLOR):
 	for color in _color_info:
-		if color.chars.has(translated_index):
+		if color.start <= index && color.end > index:
 			return color.color
-	return DEFAULT_COLOR
+	return default
 
 func _reverse_index(raw_index: int, matches: Array):
 	var reversed_index = raw_index
@@ -45,9 +42,15 @@ func _reverse_index(raw_index: int, matches: Array):
 			reversed_index -= (val.get_end() - val.get_start())
 	return reversed_index
 
-func _translate_index(index: int):
-	var translated_index = index
-	for skip in _skip_info:
-		if index >= skip.min_index:
-			translated_index += skip.amount
-	return translated_index
+# Returns ColorInfo if start, null if end
+func _parse_tag(tag: String):
+	var split_tag = tag.split("=")
+	if split_tag.size() == 1:
+		return null
+	
+	var str_color = split_tag[1]
+	var color = Color(str_color) if str_color.substr(0, 1) == "#" else ColorN(str_color)
+
+	var info = ColorInfo.new()
+	info.color = color
+	return info
