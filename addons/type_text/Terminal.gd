@@ -45,6 +45,8 @@ var _color_parser = ColorParser.new()
 # Temporary storage
 var _line_breaks: Array
 var _pause_ticks: int
+var _extra_characters = []
+var _logical_visible_characters = 0
 
 func _ready():
 	WORD_REGEX.compile("\\S+")
@@ -71,6 +73,7 @@ func _on_text_update():
 	if !_label:
 		return
 
+	_extra_characters = []
 	_pause_ticks = 0
 	
 	_timer.stop()
@@ -86,7 +89,7 @@ func _on_text_update():
 		_label.add_font_override("normal_font", font)
 	else:
 		font = _label.get_font("normal_font")
-	_label.visible_characters = 0
+	_set_visible_characters(0)
 	
 	yield(get_tree(), "idle_frame")
 	
@@ -122,7 +125,7 @@ func _update_cursor():
 		
 	var cursor_y = line_size.y * cursor_line + CURSOR_SHRINK
 	_cursor_position.value = Vector2(cursor_x, cursor_y) + _get_cursor_offset()
-	_cursor.color = _color_parser.get_color(_label.visible_characters, color)
+	_cursor.color = _color_parser.get_color(_get_visible_characters(), color)
 	
 func _should_show_cursor(args):
 	var blink_enabled = args[0]
@@ -146,7 +149,7 @@ func _should_show_cursor(args):
 	return false
 	
 func _update_pause():
-	var last_char = _label.text.substr(_label.visible_characters - 1, 1)
+	var last_char = _label.text.substr(_get_visible_characters() - 1, 1)
 	if LONG_PAUSE_CHARS.has(last_char):
 		_pause_ticks = LONG_PAUSE_TICKS
 	if SHORT_PAUSE_CHARS.has(last_char):
@@ -157,14 +160,17 @@ func _show_next_char():
 		_pause_ticks -= 1
 		return true
 	
-	if _label.visible_characters >= _label.get_total_character_count():
+	if _get_visible_characters() >= (_label.get_total_character_count() + _extra_characters.size()):
 		_last_type_time.value = -1
 		_timer.stop()
 		emit_signal("typing_end")
 		return false
 		
-	_label.visible_characters += 1
-	yield(get_tree(), "idle_frame")
+	_set_visible_characters(_get_visible_characters() + 1)
+	
+	if _get_last_visible_character() == "\n":
+		_extra_characters.push_front(_get_visible_characters() - 1)
+		print(_extra_characters)
 	
 	_last_type_time.value = OS.get_ticks_msec()
 	_update_pause()
@@ -174,14 +180,14 @@ func _show_next_char():
 func _get_current_line():
 	var line = 0
 	for line_break in _line_breaks:
-		if line_break <= _label.visible_characters:
+		if line_break <= _get_visible_characters():
 			line += 1
 	return line
 	
 func _get_current_line_text():
 	var line = _get_current_line()
 	var last_line_break = _line_breaks[line - 1] if line > 0 else 0
-	return _label.text.substr(last_line_break, _label.visible_characters - last_line_break)
+	return _label.text.substr(last_line_break, _get_visible_characters() - last_line_break)
 	
 func _get_current_full_line_text():
 	var line = _get_current_line()
@@ -203,8 +209,8 @@ func _get_cursor_offset():
 		
 	return Vector2(cursor_x, cursor_y)
 	
-func _get_last_visible_character(visible_characters := _label.visible_characters):
-	return _label.text.substr(visible_characters - 1, 1)
+func _get_last_visible_character():
+	return _label.text.substr(_get_visible_characters() - 1, 1)
 	
 func _get_line_breaks():
 	var breaks = []
@@ -228,3 +234,13 @@ func _set_speed(new_speed):
 	speed = new_speed
 	if !Engine.editor_hint && _timer:
 		_timer.wait_time = new_speed
+		
+func _set_visible_characters(visible_characters):
+	_logical_visible_characters = visible_characters
+	for decrement in _extra_characters:
+		if decrement < visible_characters:
+			visible_characters -= 1
+	_label.visible_characters = visible_characters
+
+func _get_visible_characters():
+	return _logical_visible_characters
