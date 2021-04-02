@@ -1,12 +1,6 @@
 tool
 extends Control
 
-enum TextAlign {
-	LEFT,
-	CENTER,
-	RIGHT
-}
-
 # Signals
 signal typing_start
 signal typing_end
@@ -14,7 +8,6 @@ signal typing_end
 # Exports
 export var text := "" setget _set_text
 export var font: Font = null
-export(TextAlign) var align := TextAlign.LEFT
 export var show_cursor := true
 export var persist_cursor := true
 export var auto_start := true
@@ -35,6 +28,9 @@ onready var _label := $Label
 onready var _cursor := $Label/Cursor
 var _cursor_position := Rx.new(Vector2.ZERO)
 var _last_type_time := Rx.new(-1)
+
+# Helpers
+var _color_parser = ColorParser.new()
 
 # Temporary storage
 var _current_line: int
@@ -93,7 +89,7 @@ func _enable_cursor():
 	_cursor.rect_size = Vector2(base_size / 2, base_size)
 	_cursor_position.attach(_cursor, "rect_position")
 	_cursor_position.value = Vector2(0, CURSOR_SHRINK)
-	_cursor.color = Color.white
+	_cursor.color = _color_parser.get_color(0)
 
 func _update_cursor():
 	if Engine.editor_hint:
@@ -109,7 +105,7 @@ func _update_cursor():
 		cursor_line += 1
 	var cursor_y = line_size.y * cursor_line + CURSOR_SHRINK
 	_cursor_position.value = Vector2(cursor_x, cursor_y)
-	_cursor.color = Color.white
+	_cursor.color = _color_parser.get_color(_label.visible_characters)
 	
 func _should_show_cursor(args):
 	var blink_enabled = args[0]
@@ -164,6 +160,7 @@ func _show_next_char():
 
 func _set_text(new_text):
 	text = new_text
+	_color_parser.parse(text)
 	_on_text_update()
 	
 func _set_speed(new_speed):

@@ -2,7 +2,7 @@
 
 [ext_resource path="res://addons/type_text/Terminal.tscn" type="PackedScene" id=1]
 [ext_resource path="res://TerminalTest.gd" type="Script" id=2]
-[ext_resource path="res://addons/type_text/Terminal.tres" type="DynamicFont" id=3]
+[ext_resource path="res://Terminal.tres" type="DynamicFont" id=3]
 
 [node name="TerminalTest" type="Control"]
 anchor_right = 1.0
@@ -17,8 +17,12 @@ margin_left = 105.0
 margin_top = 68.0
 margin_right = 515.0
 margin_bottom = 345.0
-text = "This is a test. I don't know what's going on here."
+text = "This is a test. I dont know what's going on here."
 font = ExtResource( 3 )
+show_cursor = true
+persist_cursor = true
+auto_start = true
+speed = 0.05
 
 [node name="Button" type="Button" parent="."]
 margin_left = 668.0

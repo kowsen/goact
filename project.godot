@@ -15,6 +15,11 @@ _global_script_classes=[ {
 "path": "res://addons/goact/scripts/util/array_util.gd"
 }, {
 "base": "Reference",
+"class": "ColorParser",
+"language": "GDScript",
+"path": "res://addons/type_text/color_parser.gd"
+}, {
+"base": "Reference",
 "class": "Lambda",
 "language": "GDScript",
 "path": "res://addons/goact/scripts/lambda/lambda.gd"
@@ -66,6 +71,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "ArrayUtil": "",
+"ColorParser": "",
 "Lambda": "",
 "Rx": "",
 "RxAttach": "",
@@ -90,7 +96,6 @@ TimingUtil="*res://addons/goact/scripts/util/timing_util.gd"
 TweenUtil="*res://addons/goact/scripts/util/tween_util.gd"
 RxLifecycle="*res://addons/goact/scripts/rx/lifecycle.gd"
 CursorTimer="*res://addons/type_text/CursorTimer.tscn"
-MonitorEffectData="*res://addons/type_text/monitor_effect_data.gd"
 
 [editor_plugins]
 
