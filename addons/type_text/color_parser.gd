@@ -21,10 +21,10 @@ func parse(text: String):
 	var stack = []
 	for result in results:
 		var parsed = _parse_tag(result.get_string(1))
-		if parsed:
+		if parsed is ColorInfo:
 			parsed.start = _reverse_index(result.get_end(), results)
 			stack.push_back(parsed)
-		else:
+		elif parsed == "close":
 			var finished = stack.pop_back()
 			finished.end = _reverse_index(result.get_start(), results)
 			_color_info.push_back(finished)
@@ -42,11 +42,15 @@ func _reverse_index(raw_index: int, matches: Array):
 			reversed_index -= (val.get_end() - val.get_start())
 	return reversed_index
 
-# Returns ColorInfo if start, null if end
+# Returns ColorInfo if start, close if end, null if other tag
 func _parse_tag(tag: String):
 	var split_tag = tag.split("=")
-	if split_tag.size() == 1:
+	
+	if split_tag[0] != "color" && split_tag[0] != "/color":
 		return null
+	
+	if split_tag.size() == 1:
+		return "close"
 	
 	var str_color = split_tag[1]
 	var color = Color(str_color) if str_color.substr(0, 1) == "#" else ColorN(str_color)

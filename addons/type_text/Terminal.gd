@@ -1,6 +1,12 @@
 tool
 extends Control
 
+enum TextAlign {
+	LEFT,
+	CENTER,
+	RIGHT
+}
+
 # Signals
 signal typing_start
 signal typing_end
@@ -9,8 +15,10 @@ signal typing_end
 export(String, MULTILINE) var text := "" setget _set_text
 export var font: Font = null
 export var color := Color.white
+export(TextAlign) var align := TextAlign.LEFT
 export var show_cursor := true
 export var persist_cursor := true
+export var break_cursor := true
 export var auto_start := true
 export var speed := 0.05 setget _set_speed
 
@@ -22,6 +30,7 @@ var LONG_PAUSE_TICKS = 5
 var SHORT_PAUSE_CHARS = [","]
 var SHORT_PAUSE_TICKS = 3
 var SHOW_CURSOR_MS = 30
+var WORD_REGEX = RegEx.new()
 
 # Ready variables
 onready var _timer := $Timer
@@ -34,11 +43,11 @@ var _last_type_time := Rx.new(-1)
 var _color_parser = ColorParser.new()
 
 # Temporary storage
-var _current_line: int
-var _last_line_break: int
+var _line_breaks: Array
 var _pause_ticks: int
 
 func _ready():
+	WORD_REGEX.compile("\\S+")
 	_timer.connect("timeout", self, "_show_next_char")
 	
 	yield(get_tree(), "idle_frame")
@@ -62,12 +71,16 @@ func _on_text_update():
 	if !_label:
 		return
 
-	_current_line = 0
-	_last_line_break = 0
 	_pause_ticks = 0
 	
 	_timer.stop()
-	_label.bbcode_text = text
+	if align == TextAlign.LEFT:
+		_label.bbcode_text = text
+	elif align == TextAlign.CENTER:
+		_label.bbcode_text = "[center]" + text + "[/center]"
+	elif align == TextAlign.RIGHT:
+		_label.bbcode_text = "[right]" + text + "[/right]"
+	
 	_label.add_color_override("default_color", color)
 	if font:
 		_label.add_font_override("normal_font", font)
@@ -76,6 +89,8 @@ func _on_text_update():
 	_label.visible_characters = 0
 	
 	yield(get_tree(), "idle_frame")
+	
+	_line_breaks = _get_line_breaks()
 	
 	if Engine.editor_hint:
 		while _show_next_char():
@@ -90,23 +105,23 @@ func _enable_cursor():
 	var base_size = font.get_string_size("A").y - (CURSOR_SHRINK * 2)
 	_cursor.rect_size = Vector2(base_size / 2, base_size)
 	_cursor_position.attach(_cursor, "rect_position")
-	_cursor_position.value = Vector2(0, CURSOR_SHRINK)
+	_cursor_position.value = Vector2(0, CURSOR_SHRINK) + _get_cursor_offset()
 	_cursor.color = _color_parser.get_color(0, color)
 
 func _update_cursor():
 	if Engine.editor_hint:
 		return
-	
-	var line_str = _get_current_line_str()
-	var line_size = font.get_string_size(line_str)
 
-	var cursor_line = _current_line
+	var line_size = font.get_string_size(_get_current_line_text())
+
+	var cursor_line = _get_current_line()
 	var cursor_x = line_size.x + CURSOR_PAD
-	if (cursor_x + _cursor.rect_size.x) > rect_size.x:
+	if break_cursor && (cursor_x + _get_cursor_offset().x + _cursor.rect_size.x) > rect_size.x:
 		cursor_x = 0
 		cursor_line += 1
+		
 	var cursor_y = line_size.y * cursor_line + CURSOR_SHRINK
-	_cursor_position.value = Vector2(cursor_x, cursor_y)
+	_cursor_position.value = Vector2(cursor_x, cursor_y) + _get_cursor_offset()
 	_cursor.color = _color_parser.get_color(_label.visible_characters, color)
 	
 func _should_show_cursor(args):
@@ -149,32 +164,60 @@ func _show_next_char():
 		return false
 		
 	_label.visible_characters += 1
-
-	if _should_wrap_line():
-		_current_line += 1
-		_last_line_break = _label.visible_characters - 1
-		print("BROKE AT ", _last_line_break)
+	yield(get_tree(), "idle_frame")
 	
 	_last_type_time.value = OS.get_ticks_msec()
 	_update_pause()
 	_update_cursor()
 	return true
 	
-func _should_wrap_line():
-	var line_height = font.get_string_size("A").y
-	var visible_characters = _label.visible_characters
-	while _get_last_visible_character(visible_characters).strip_edges().length() > 0:
-		visible_characters += 1
-	var current_line = _get_current_line_str(visible_characters)
-	print(visible_characters, ": ", current_line)
-	var current_height = font.get_wordwrap_string_size(current_line, rect_size.x).y
-	return current_height > line_height
+func _get_current_line():
+	var line = 0
+	for line_break in _line_breaks:
+		if line_break <= _label.visible_characters:
+			line += 1
+	return line
+	
+func _get_current_line_text():
+	var line = _get_current_line()
+	var last_line_break = _line_breaks[line - 1] if line > 0 else 0
+	return _label.text.substr(last_line_break, _label.visible_characters - last_line_break)
+	
+func _get_current_full_line_text():
+	var line = _get_current_line()
+	var last_line_break = _line_breaks[line - 1] if line > 0 else 0
+	var next_line_break = _line_breaks[line] if line < _line_breaks.size() else _label.text.length()
+	return _label.text.substr(last_line_break, next_line_break - last_line_break)
+	
+func _get_cursor_offset():
+	var cursor_x = 0
+	var cursor_y = 0
+	
+	var full_line_size = font.get_string_size(_get_current_full_line_text())
+	
+	if align == TextAlign.CENTER:
+		cursor_x += (rect_size.x - full_line_size.x) / 2
+	
+	if align == TextAlign.RIGHT:
+		cursor_x += rect_size.x - full_line_size.x
+		
+	return Vector2(cursor_x, cursor_y)
 	
 func _get_last_visible_character(visible_characters := _label.visible_characters):
 	return _label.text.substr(visible_characters - 1, 1)
 	
-func _get_current_line_str(visible_characters := _label.visible_characters):
-	return _label.text.substr(_last_line_break, visible_characters - _last_line_break)
+func _get_line_breaks():
+	var breaks = []
+	var words = WORD_REGEX.search_all(_label.text)
+	var last_height = font.get_string_size("A").y
+	for word_match in words:
+		var index = word_match.get_end()
+		var to_word = _label.text.substr(0, index)
+		var line_height = font.get_wordwrap_string_size(to_word, rect_size.x).y
+		if line_height > last_height:
+			last_height = line_height
+			breaks.push_back(word_match.get_start())
+	return breaks
 
 func _set_text(new_text):
 	text = new_text
