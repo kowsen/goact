@@ -20,13 +20,13 @@ func _init():
 
 func parse(text: String):
 	var results = REGEX.search_all(text)
-	print(_reverse_index(16, results))
-	print(_reverse_index(15, results))
-	print(_reverse_index(4, results))
-	print(_reverse_index(5, results))
-	# print(ArrayUtil.map(results, "x => x.get_start()"))
-	# print(ArrayUtil.map(results, "x => x.get_end()"))
-	# print(ArrayUtil.map(results, "x => x.get_string()"))
+	for result in results:
+		var skip = TagSkipInfo.new()
+		skip.min_index = _reverse_index(result.get_end(), results)
+		skip.amount = result.get_end() - result.get_start()
+		_skip_info.push_back(skip)
+	
+	
 	pass
 	# populate _skip_info
 	# populate _color_info
